@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+		
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<center><h1 id="title"><u>Go Back n Protocol</u></h1></center>
+		
+	<style>
+			
+		#title
+		{
+			position: absolute
+			top: 5px;
+			font-size: 35px;
+		}
+			
+		#canvas
+		{ 
+			position: absolute; 
+			visibility: visible; 
+			left: 40px; 
+			top: 165px; 
+			z-index: 1; 
+		}
+			
+		#legend
+		{
+			position: absolute; 
+			visibility: visible; 
+			right: 5px; 
+			top: 165px; 
+			z-index: 1; 
+		}
+			
+		#key
+		{
+			position: absolute; 
+			visibility: visible; 
+			right: 65px; 
+			top: 165px; 
+			z-index: 200; 
+			font-size: 20px;
+		}
+			
+		#start
+		{
+			background-color: #e7e7e7; 
+			border: 2px solid black;
+			color: black;
+			padding: 10px 20px;
+			text-align: center;
+			font-size: 20px;
+			cursor: pointer;
+			transition-duration: 0.4s;
+			display: inline-block;
+			margin-left: 400px;
+			border-radius: 8px;
+		}
+			
+		#stop
+		{
+			background-color: #e7e7e7; 
+			border: 2px solid black;
+			color: black;
+			padding: 10px 20px;
+			text-align: center;
+			font-size: 20px;
+			cursor: pointer;
+			transition-duration: 0.4s;
+			display: inline-block;
+			margin-left: 300px;
+			border-radius: 8px;
+		}
+		
+		#kill
+		{
+			right: 50px; 
+			top: 600px; 
+			background-color: #e7e7e7; 
+			border: 2px solid black;
+			color: black;
+			padding: 10px 20px;
+			text-align: center;
+			font-size: 20px;
+			cursor: pointer;
+			transition-duration: 0.4s;
+			position: absolute;
+			border-radius: 8px;
+		}
+		
+		#text-canvas
+		{
+			position: absolute; 
+			visibility: visible; 
+			left: 600px; 
+			top: 400px;
+		
+		}
+			
+			
+		#start:hover 
+		{
+			box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+		}
+			
+		#stop:hover 
+		{
+			box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+		}
+		
+		#kill:hover 
+		{
+			box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+		}
+		
+	</style>
+	<script src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="./GoBackn.js"></script>
+</head>
+
+<body onload = "goBackN.init()">
+
+	<div id="key">
+		<h2><b>LEGEND</b></h2>
+		Data not recieved</br>
+		Data ready to send</br>
+		Acknowladgement</br>
+		Transmission confirmed</br>
+		Packet lost while transmission</br>
+		Data has been delivered to upper network layer</br>
+	</div>
+	
+	
+	<button id="start" onclick="goBackN.sendNewPacket() ; goBackN.noise()">
+		Start Simulation
+	</button>
+	
+	<input type="button" onclick="goBackN.pause()" id = "stop"  value = "Pause Simulation">
+	</button>
+	
+	<button onclick="goBackN.dropPackets()" id = "kill" disabled ="true">
+		Kill Packet
+	</button>
+
+	<div><canvas id="text-canvas" height ="100" width="1000"></canvas></div>	
+	
+	<canvas id="canvas" height="520" width="1000" style="border:5px solid #000000;"> Your browser does not support the HTML5 canvas tag.</canvas>
+		
+	<canvas id="legend" width="450" height="230" style="border: 3px solid #000000;" ></canvas>
+	
+	<script>
+	
+		
+		//legend
+		c = document.getElementById("legend");
+		ctx = c.getContext("2d");
+		ctx.rect(410,70,30,20);
+		ctx.stroke();
+		ctx.fillStyle="#0099FF";
+		ctx.fillRect(410,95,30,20);
+		ctx.fillStyle="#33CC33";
+		ctx.fillRect(410,120,30,20);
+		ctx.fillStyle="#FFFF00";
+		ctx.fillRect(410,145,30,20);
+		ctx.fillStyle="#FF0000";
+		ctx.fillRect(410,170,30,20);
+		ctx.fillStyle="#000000";
+		ctx.fillRect(410,195,30,20);
+	
+	</script>
+	
+</body>
+</html>

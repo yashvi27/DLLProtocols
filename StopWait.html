@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<center><h1 id="title"><u>Stop and Wait Protocol</u></h1></center>
+		
+		<style>
+			
+			#title
+			{
+				position: absolute
+				top: 5px;
+				font-size: 35px;
+			}
+			
+			#packetFrame
+			{ 
+				position: absolute; 
+				visibility: visible; 
+				left: 40px; 
+				top: 165px; 
+				z-index: 1; 
+			}
+			
+			#legend
+			{
+				position: absolute; 
+				visibility: visible; 
+				right: 5px; 
+				top: 165px; 
+				z-index: 1; 
+			}
+			
+			#key
+			{
+				position: absolute; 
+				visibility: visible; 
+				right: 65px; 
+				top: 165px; 
+				z-index: 200; 
+				font-size: 20px;
+			}
+			
+			#timer
+			{
+				position: absolute; 
+				visibility: visible; 
+				left: -910px;
+				top:625px; 
+				z-index: 0; 
+			}
+		
+			
+			#start
+			{
+				background-color: #e7e7e7; 
+				border: 2px solid black;
+				color: black;
+				padding: 10px 20px;
+				text-align: center;
+				font-size: 20px;
+				cursor: pointer;
+				transition-duration: 0.4s;
+				display: inline-block;
+				margin-left: 400px;
+				border-radius: 8px;
+			}
+			
+			#stop
+			{
+				background-color: #e7e7e7; 
+				border: 2px solid black;
+				color: black;
+				padding: 10px 20px;
+				text-align: center;
+				font-size: 20px;
+				cursor: pointer;
+				transition-duration: 0.4s;
+				display: inline-block;
+				margin-left: 300px;
+				border-radius: 8px;
+			}
+			
+			#start:hover 
+			{
+				box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+			}
+			
+			#stop:hover 
+			{
+				box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+			}
+			
+		</style>
+			
+	</head>
+	
+<body>
+	<div id="key">
+		<h2><b>LEGEND</b></h2>
+		Data not recieved</br>
+		Data ready to send</br>
+		Acknowladgement</br>
+		Negative Acknowladgement</br>
+		Transmission confirmed</br>
+		Packet lost while transmission</br>
+		Data recieved is distorted</br>
+		Data has been delivered to upper network layer</br>
+	</div>
+	
+	
+	<button id="start" onclick="start(); repeat(25)">
+		Start Simulation
+	</button>
+	
+	<button id="stop" onclick="stop()" >
+		Stop Simulation
+	</button>
+		
+	<canvas id="packetFrame" style="border:5px solid #000000;"> Your browser does not support the HTML5 canvas tag.</canvas>
+	
+	<canvas id="timer" width="2000" height="200"></canvas>
+
+	<canvas id="legend" width="450" height="280" style="border: 3px solid #000000;" ></canvas>
+	
+	<script>
+	
+		//draw layout
+		var d = document.getElementById("packetFrame");
+		d.height = 520; d.width = 1000;
+		var dtx = d.getContext("2d");
+		var i;
+		for (i = 0; i < 1000; i=i+60) 
+		{ 
+			dtx.beginPath();
+			dtx.fillStyle="#0099FF";
+			dtx.fillRect(20+i,20,50,100);
+			
+			dtx.beginPath();
+			dtx.lineWidth="2";
+			dtx.strokeStyle="black";
+			dtx.rect(20+i,400, 50, 100);
+			dtx.stroke();
+
+		}
+		
+		var y=0;
+		var flag=true;
+		
+		
+		//stop simulation
+		function stop()
+		{
+			flag=false;
+		}
+		
+		//negative acknowladgement
+		function negAck()
+		{	
+			//send packet
+			function packetMove() 
+			{  
+				var pos = 120;
+				var id = setInterval(framePkt, 20);
+				
+				function framePkt() 
+				{
+					if (pos == 400) 
+					{
+						clearInterval(id);
+						dtx.rect(20+y,pos,50,100);
+						dtx.stroke();
+
+					} 
+					else 
+					{
+						
+						pos++; 
+						dtx.fillStyle="#0099FF";
+						dtx.fillRect(20+y,pos,50,100);
+					}
+				}
+			}
+				
+			function removePkt()
+			{
+				pos=120;
+				var stop = setInterval(disappearPkt, 25);
+				function disappearPkt()
+				{
+					if (pos == 400) 
+					{
+						clearInterval(stop);
+						dtx.fillStyle="#993333";
+						dtx.fillRect(20+y,pos,50,100);
+						ackMove();
+						removeAck();
+					} 
+					else 
+					{
+						pos++;
+						dtx.clearRect(20+y,pos,50,100);
+					}
+				}
+			}
+			
+			packetMove();
+			removePkt();
+			startTime();
+			
+			//send acknowladgement
+			function ackMove()
+			{
+				var pos = 300;
+				var id = setInterval(frameAck, 20);
+				
+				function frameAck() 
+				{
+					if (pos == 20) 
+					{
+						clearInterval(id);
+						dtx.fillStyle="#0099FF";
+						dtx.fillRect(20+y,pos,50,100);
+					} 
+					else 
+					{
+						pos--; 
+						dtx.fillStyle="#FF0000";
+						dtx.fillRect(20+y,pos,50,100);
+					}
+				}
+			}
+				
+			function removeAck()
+			{
+				pos=300;
+				var stop = setInterval(disappearAck, 25);
+				function disappearAck()
+				{
+					if (pos == 76) 
+					{
+						clearInterval(stop);
+					} 
+					else 
+					{
+						pos--;
+						dtx.clearRect(20+y,pos,50,100);
+					}
+				}
+			}
+		}
+		
+		
+		//packet lost
+		function lostPckt()
+		{
+			function packetMove() 
+			{  
+				var pos = 120;
+				var id = setInterval(framePkt, 20);
+				
+				function framePkt() 
+				{
+					if (pos == 180) 
+					{
+						clearInterval(id);
+
+					} 
+					else 
+					{
+						
+						pos++; 
+						dtx.fillStyle="#0000E6";
+						dtx.fillRect(20+y,pos,50,100);
+					}
+				}
+			}
+				
+			function removePkt()
+			{
+				pos=120;
+				var stop = setInterval(disappearPkt, 25);
+				function disappearPkt()
+				{
+					if (pos == 240) 
+					{
+						clearInterval(stop);
+					} 
+					else 
+					{
+						pos++;
+						dtx.clearRect(20+y,pos,50,100);
+					}
+				}
+			}
+			
+			packetMove();
+			removePkt();
+			startTime();
+		}
+		
+		
+		
+		//simulation
+		function start()
+		{
+			//send packet
+			function packetMove() 
+			{  
+				var pos = 120;
+				var id = setInterval(framePkt, 20);
+				
+				function framePkt() 
+				{
+					if (pos == 400) 
+					{
+						clearInterval(id);
+						dtx.fillStyle="#000000";
+						dtx.fillRect(20+y,pos,50,100);
+
+					} 
+					else 
+					{
+						
+						pos++; 
+						dtx.fillStyle="#0099FF";
+						dtx.fillRect(20+y,pos,50,100);
+					}
+				}
+			}
+				
+			function removePkt()
+			{
+				pos=120;
+				var stop = setInterval(disappearPkt, 25);
+				function disappearPkt()
+				{
+					if (pos == 344) 
+					{
+						clearInterval(stop);
+						ackMove();
+						removeAck();
+					} 
+					else 
+					{
+						pos++;
+						dtx.clearRect(20+y,pos,50,100);
+					}
+				}
+			}
+			
+			packetMove();
+			removePkt();
+			startTime();
+			
+			//send acknowladgement
+			function ackMove()
+			{
+				var pos = 300;
+				var id = setInterval(frameAck, 20);
+				
+				function frameAck() 
+				{
+					if (pos == 20) 
+					{
+						clearInterval(id);
+						dtx.fillStyle="#FFFF00";
+						dtx.fillRect(20+y,pos,50,100);
+					} 
+					else 
+					{
+						pos--; 
+						dtx.fillStyle="#33CC33";
+						dtx.fillRect(20+y,pos,50,100);
+					}
+				}
+			}
+				
+			function removeAck()
+			{
+				pos=300;
+				var stop = setInterval(disappearAck, 25);
+				function disappearAck()
+				{
+					if (pos == 76) 
+					{
+						clearInterval(stop);
+					} 
+					else 
+					{
+						pos--;
+						dtx.clearRect(20+y,pos,50,100);
+					}
+				}
+			}
+			
+		}
+		
+			
+		//repeated simulation
+		var prev=2;
+		function repeat(rep) 
+		{
+			setTimeout(function () 
+						{
+							var decide=Math.floor(Math.random() * 5);
+							y=y+60;
+						
+							if(decide==0)
+							{
+								negAck();
+								if(prev==0 || prev==1)
+									y=y-60;
+								prev=decide;
+							}
+							
+							else if(decide==1)
+							{
+								lostPckt();
+								if(prev==0 || prev==1)
+									y=y-60;
+								prev=decide;
+							}
+														
+							else
+							{
+								if(prev==0 || prev==1)
+									y=y-60;
+								prev=decide;
+								start();
+							}
+							if (--rep && flag)       
+								repeat(rep); 		
+						}, 14000);
+		};
+		
+
+		
+		
+		//timer
+		function startTime()
+		{
+			var canvas = document.getElementById('timer');
+			var context = canvas.getContext('2d');
+			var al=0;
+			var start=4.72;
+			var cw=context.canvas.width/2;
+			var ch=context.canvas.height/2;
+			var diff;
+			 
+			function progressBar()
+			{
+				diff=(al/100)*Math.PI*2;
+				context.beginPath();
+				context.arc(cw+y,ch,20,0,2*Math.PI,false);
+				context.fillStyle='#FFF';
+				context.fill();
+				context.strokeStyle='#ffe6f7';
+				context.stroke();
+				context.fillStyle='#000';
+				context.strokeStyle='#b3007a';
+				context.textAlign='center';
+				context.lineWidth=10;
+				context.beginPath();
+				context.arc(cw+y,ch,20,start,diff+start,false);
+				context.stroke();
+				if(al>=100)
+				{
+					clearTimeout(bar);
+				}
+						 
+				al++;
+			}
+			var bar=setInterval(progressBar,110);
+		}
+		
+				
+		//legend
+		c = document.getElementById("legend");
+		ctx = c.getContext("2d");
+		ctx.rect(410,70,30,20);
+		ctx.stroke();
+		ctx.fillStyle="#0099FF";
+		ctx.fillRect(410,95,30,20);
+		ctx.fillStyle="#33CC33";
+		ctx.fillRect(410,120,30,20);
+		ctx.fillStyle="#FF0000";
+		ctx.fillRect(410,145,30,20);
+		ctx.fillStyle="#FFFF00";
+		ctx.fillRect(410,170,30,20);
+		ctx.fillStyle="#0000E6";
+		ctx.fillRect(410,195,30,20);
+		ctx.fillStyle="#993333";
+		ctx.fillRect(410,220,30,20);
+		ctx.fillStyle="#000000";
+		ctx.fillRect(410,245,30,20);
+		
+	</script> 
+
+	
+</body>
+
+</html>
